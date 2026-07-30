@@ -36,7 +36,9 @@
   ctx.imageSmoothingEnabled = false;
 
   const spriteAtlas = new Image();
-  spriteAtlas.src = "./sprites-v2.png";
+  spriteAtlas.src = "./sprites-v3.png";
+  const enemyAtlas = new Image();
+  enemyAtlas.src = "./enemy-animations-v3.png";
   const backgroundAtlas = new Image();
   backgroundAtlas.src = "./backgrounds-v3.png";
 
@@ -261,8 +263,9 @@
       dir: -1, hitFlash: 0, attackCd: Math.random(),
       shootCd: 1.2 + Math.random(), dead: false, stun: 0, slow: 0,
       phase: Math.random() * Math.PI * 2, burn: 0, burnTick: 0,
-      windup: 0, action: "idle", chargeTimer: 0, telegraph: 0,
-      knockVx: 0,
+      windup: 0, windupMax: 0, action: "idle", chargeTimer: 0, telegraph: 0,
+      knockVx: 0, attackAnim: 0, attackKind: "", animTime: Math.random()*2,
+      stepDust: 0, moving: false,
     });
   }
 
@@ -763,6 +766,8 @@
   function executeEnemyAttack(e) {
     const scale = threatScale();
     const dx = player.x - e.x;
+    e.attackKind=e.action;
+    e.attackAnim=e.type==="boss"?.48:e.type==="drone"?.3:.26;
     if (e.action === "droneShot") {
       const px=e.x+e.w/2, py=e.y+e.h/2;
       const tx=player.x+player.w/2, ty=player.y+player.h/2;
@@ -794,7 +799,9 @@
 
   function beginWindup(e, action, duration) {
     e.action=action;
+    e.attackAnim=0;
     e.windup=duration*(e.elite?.78:1);
+    e.windupMax=e.windup;
     e.telegraph=e.windup;
     sfx("alert");
   }
@@ -802,12 +809,16 @@
   function updateEnemies(dt) {
     for (const e of enemies) {
       if (e.dead) continue;
+      e.animTime+=dt;
+      e.attackAnim=Math.max(0,e.attackAnim-dt);
+      e.moving=false;
       e.hitFlash = Math.max(0,e.hitFlash-dt);
       e.attackCd = Math.max(0,e.attackCd-dt);
       e.shootCd = Math.max(0,e.shootCd-dt);
       e.stun = Math.max(0,e.stun-dt);
       e.slow = Math.max(0,e.slow-dt);
       e.x += e.knockVx*dt;
+      if(Math.abs(e.knockVx)>18)e.moving=true;
       e.knockVx *= Math.pow(.02,dt);
       e.phase += dt*2;
       if (e.burn > 0) {
@@ -833,6 +844,12 @@
       if (e.chargeTimer > 0) {
         e.chargeTimer -= dt;
         e.x += e.dir*(e.type==="boss"?760:680)*scale*dt;
+        e.moving=true;
+        e.stepDust-=dt;
+        if(e.stepDust<=0){
+          e.stepDust=.075;
+          burst(e.x+e.w/2,e.y+e.h,"#d7b27d",e.type==="boss"?6:3,e.type==="boss"?150:90);
+        }
         if (aabb(player,e)) {
           hurtPlayer(e.damage*1.15*scale,e.x+e.w/2);
           e.chargeTimer=0;
@@ -842,16 +859,24 @@
 
       if (e.type === "drone") {
         e.x += Math.sign(dx)*e.speed*.22*slow*scale*dt;
+        e.moving=dist>30;
         if (dist<720 && e.shootCd<=0) beginWindup(e,"droneShot",.46);
       } else if (e.type === "boss") {
         if (e.attackCd<=0 && dist<600) beginWindup(e,dist>175&&Math.random()<.58?"bossVolley":"bossSlam",dist>175?.72:.5);
-        else if(dist>135)e.x+=e.dir*e.speed*slow*scale*dt;
+        else if(dist>135){e.x+=e.dir*e.speed*slow*scale*dt;e.moving=true;}
       } else if (e.type === "roller") {
         if(e.attackCd<=0&&dist<470)beginWindup(e,"rollCharge",.54);
-        else if(dist>80)e.x+=e.dir*e.speed*.65*slow*scale*dt;
+        else if(dist>80){e.x+=e.dir*e.speed*.65*slow*scale*dt;e.moving=true;}
       } else {
         if(e.attackCd<=0&&dist<92)beginWindup(e,"melee",.38);
-        else if(dist>72)e.x+=e.dir*e.speed*slow*scale*dt;
+        else if(dist>72){e.x+=e.dir*e.speed*slow*scale*dt;e.moving=true;}
+      }
+      if(e.moving&&e.type!=="drone"){
+        e.stepDust-=dt;
+        if(e.stepDust<=0){
+          e.stepDust=e.type==="boss"?.22:e.type==="roller"?.09:.16;
+          burst(e.x+e.w/2,e.y+e.h,"#c79c68",e.type==="boss"?5:2,e.type==="boss"?120:70);
+        }
       }
     }
     enemies = enemies.filter(e=>!e.dead);
@@ -1122,6 +1147,18 @@
     return true;
   }
 
+  function drawEnemyAtlas(col,row,x,y,w,h,flip=false,filter="none") {
+    if(!enemyAtlas.complete||!enemyAtlas.naturalWidth)return false;
+    const sw=enemyAtlas.naturalWidth/5,sh=enemyAtlas.naturalHeight/4;
+    ctx.save();
+    ctx.imageSmoothingEnabled=false;
+    ctx.filter=filter;
+    if(flip){ctx.translate(x+w,y);ctx.scale(-1,1);ctx.drawImage(enemyAtlas,col*sw,row*sh,sw,sh,0,0,w,h);}
+    else ctx.drawImage(enemyAtlas,col*sw,row*sh,sw,sh,x,y,w,h);
+    ctx.restore();
+    return true;
+  }
+
   function drawPlayer(p) {
     ctx.save();
     const land=p.landingTimer>0?p.landingTimer/.16:0;
@@ -1163,28 +1200,63 @@
   function drawEnemy(e) {
     ctx.save();
     if(e.windup>0){
-      const flash=Math.floor(time*16)%2===0;
-      ctx.globalAlpha=flash?.48:.22;
+      const progress=1-e.windup/Math.max(.01,e.windupMax);
+      const flash=Math.floor(time*(12+progress*12))%2===0;
+      ctx.globalAlpha=flash?.46:.18;
       ctx.fillStyle="#ff403d";
       if(e.type==="drone"){
         ctx.fillRect(e.x-8,e.y+e.h/2-3,(player.x-e.x)+player.w/2,6);
       }else{
-        const reach=e.type==="boss"?230:e.type==="roller"?290:105;
-        ctx.fillRect(e.dir>0?e.x+e.w:e.x-reach,e.y+e.h*.3,reach,e.h*.58);
+        const reach=e.type==="boss"?250:e.type==="roller"?320:125;
+        ctx.fillRect(e.dir>0?e.x+e.w:e.x-reach,e.y+e.h*.28,reach,e.h*.62);
       }
       ctx.globalAlpha=1;
       ctx.fillStyle="#ffdf8a";ctx.font="900 22px monospace";ctx.textAlign="center";ctx.fillText("!",e.x+e.w/2,e.y-24);
     }
     if(e.elite){ctx.fillStyle=`rgba(255,202,83,${.12+Math.sin(time*8)*.05})`;ctx.fillRect(e.x-10,e.y-10,e.w+20,e.h+20);}
-    if(e.hitFlash>0)ctx.filter="brightness(2.5)";
     if(e.stun>0){ctx.fillStyle="#ffe078";ctx.font="18px monospace";ctx.fillText("✦ ✦",e.x+e.w*.25,e.y-8);}
-    const col=e.type==="drone"?1:e.type==="roller"?2:e.type==="boss"?3:0;
-    const size=e.type==="boss"?235:e.type==="drone"?118:e.type==="roller"?128:120;
-    const ox=e.x-(size-e.w)/2,oy=e.y-(size-e.h)+16;
-    const used=drawAtlas(col,2,ox,oy,size,size,e.dir<0,e.hitFlash>0?"brightness(2.4)":"none");
+
+    const row=e.type==="drone"?1:e.type==="roller"?2:e.type==="boss"?3:0;
+    let frame=0;
+    if(e.windup>0)frame=e.type==="boss"?2:e.type==="drone"?2:3;
+    else if(e.attackAnim>0){
+      if(e.type==="drone")frame=e.attackAnim>.15?3:4;
+      else if(e.type==="roller")frame=4;
+      else if(e.type==="boss")frame=e.attackKind==="bossVolley"?4:3;
+      else frame=4;
+    }else if(e.type==="drone")frame=Math.floor(e.animTime*7)%2;
+    else if(e.moving)frame=e.type==="boss"?1:1+Math.floor(e.animTime*(e.type==="roller"?13:10))%2;
+
+    const size=e.type==="boss"?340:e.type==="drone"?220:230;
+    const ox=e.x-(size-e.w)/2,oy=e.y-(size-e.h)-8;
+    const anchorX=e.x+e.w/2,anchorY=e.y+e.h;
+    let scaleX=1,scaleY=1,lean=0,shift=0;
+    if(e.windup>0){scaleX=.92;scaleY=1.07;lean=-e.dir*.035;shift=-e.dir*7;}
+    if(e.attackAnim>0){scaleX=1.09;scaleY=.94;lean=e.dir*.055;shift=e.dir*12;}
+    if(e.hitFlash>0){scaleX=1.08;scaleY=.9;lean=-e.dir*.08;shift=-e.dir*8;}
+    if(e.type==="drone")shift+=Math.sin(e.animTime*8)*3;
+
+    ctx.fillStyle="rgba(8,7,10,.28)";
+    ctx.beginPath();ctx.ellipse(anchorX,anchorY+3,e.w*(e.type==="boss"?.68:.58),e.type==="drone"?5:9,0,0,7);ctx.fill();
+    ctx.translate(anchorX+shift,anchorY);
+    ctx.rotate(lean);
+    ctx.scale(scaleX,scaleY);
+    ctx.translate(-anchorX,-anchorY);
+    const used=drawEnemyAtlas(frame,row,ox,oy,size,size,e.dir<0,e.hitFlash>0?"brightness(2.6)":"none");
     if(!used){ctx.fillStyle="#30343a";ctx.fillRect(e.x,e.y,e.w,e.h);}
+    ctx.restore();
+
+    ctx.save();
+    if(e.chargeTimer>0){
+      ctx.globalAlpha=.32;ctx.fillStyle="#ffe3a1";
+      for(let i=1;i<5;i++)ctx.fillRect(e.x-e.dir*i*24,e.y+18+i*5,18+i*5,5);
+    }
+    if(e.attackAnim>0&&e.type==="boss"&&e.attackKind==="bossSlam"){
+      ctx.globalAlpha=.35;ctx.strokeStyle="#ffd179";ctx.lineWidth=8;
+      ctx.beginPath();ctx.ellipse(e.x+e.w/2,GROUND,125*(1-e.attackAnim/.5)+30,18,0,0,7);ctx.stroke();
+    }
     if(e.type!=="boss"){
-      ctx.fillStyle="rgba(0,0,0,.72)";ctx.fillRect(e.x,e.y-13,e.w,7);
+      ctx.globalAlpha=1;ctx.fillStyle="rgba(0,0,0,.72)";ctx.fillRect(e.x,e.y-13,e.w,7);
       ctx.fillStyle=e.elite?"#f4bf52":"#e34c47";ctx.fillRect(e.x,e.y-13,e.w*Math.max(0,e.hp/e.maxHp),7);
     }
     ctx.restore();

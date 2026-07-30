@@ -50,6 +50,8 @@ test("serves the game route and keeps all playable assets", async () => {
     access(new URL("game.js", gameRoot)),
     access(new URL("key-art.png", gameRoot)),
     access(new URL("sprites-v2.png", gameRoot)),
+    access(new URL("sprites-v3.png", gameRoot)),
+    access(new URL("enemy-animations-v3.png", gameRoot)),
     access(new URL("backgrounds-v3.png", gameRoot)),
     access(new URL("audio/music-meadow.wav", gameRoot)),
     access(new URL("audio/music-chase.wav", gameRoot)),
@@ -69,7 +71,9 @@ test("serves the game route and keeps all playable assets", async () => {
   assert.match(gameScript, /function speakOusang/);
   assert.match(gameScript, /function openUpgrade/);
   assert.match(gameScript, /function drawAtlas/);
+  assert.match(gameScript, /function drawEnemyAtlas/);
   assert.match(gameScript, /function beginWindup/);
+  assert.match(gameScript, /enemy-animations-v3\.png/);
   assert.match(gameScript, /function createObstacles/);
   assert.match(gameScript, /function damageObstacle/);
   assert.match(gameScript, /backgrounds-v3\.png/);
