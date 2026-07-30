@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#9f1f24" />
+    <meta name="description" content="点击招牌进入欧记趣味养猪场，召唤会散步、会抱团起飞的彩色小猪。" />
+    <title>欧记猪肉 · 欧桑养猪场</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="site" id="site">
+      <section class="farm" id="farm" aria-label="欧记趣味养猪场，点击空地召唤彩色小猪">
+        <div class="sky">
+          <div class="sun"></div>
+          <div class="cloud cloud-one"></div>
+          <div class="cloud cloud-two"></div>
+          <div class="hills hills-back"></div>
+          <div class="hills hills-front"></div>
+        </div>
+
+        <div class="barn" aria-hidden="true">
+          <div class="barn-roof"></div>
+          <div class="barn-body"><span class="barn-mark">欧</span><div class="barn-door"></div></div>
+        </div>
+        <div class="windmill" aria-hidden="true">
+          <div class="windmill-wheel"><i></i><i></i><i></i><i></i></div>
+          <div class="windmill-post"></div>
+        </div>
+        <div class="fence fence-left" aria-hidden="true"></div>
+        <div class="fence fence-right" aria-hidden="true"></div>
+
+        <header class="farm-topbar">
+          <div class="mini-brand"><span>欧</span> 欧记猪肉牧场</div>
+          <div class="controls">
+            <div class="pig-count" id="pig-count" aria-live="polite">在场 0</div>
+            <button type="button" id="sound-button" aria-label="关闭声音">声</button>
+            <button type="button" id="night-button" aria-label="切换夜晚">月</button>
+          </div>
+        </header>
+
+        <div class="instruction">
+          <span>轻点牧场 · 召唤彩色小猪</span>
+          <strong>同色四只，抱团起飞</strong>
+          <small>小猪会自己散步，听见猪叫就抬头看</small>
+        </div>
+
+        <div class="pig-layer" id="pig-layer" aria-live="polite"></div>
+        <footer>牧场状态：<b id="farm-status">等你开张</b></footer>
+      </section>
+
+      <section class="welcome" id="welcome">
+        <div class="paper-noise"></div>
+        <p class="welcome-kicker">始于一九八八 · 新鲜好味道</p>
+        <button class="logo-sign" id="enter-button" type="button" aria-label="进入欧记猪肉养猪场">
+          <span class="seal">欧</span>
+          <span class="logo-copy">
+            <small>OU KEE PORK CO.</small>
+            <strong>欧记猪肉</strong>
+            <em>用心养 · 放心吃</em>
+          </span>
+          <span class="logo-pig" aria-hidden="true">豬</span>
+        </button>
+        <p class="tap-hint"><span></span> 点击招牌 · 入场赶猪 <span></span></p>
+        <div class="welcome-stamp">每日<br />新鲜</div>
+      </section>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>
