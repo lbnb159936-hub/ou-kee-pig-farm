@@ -216,6 +216,7 @@ export default function Home() {
         <header className="farm-topbar">
           <div className="mini-brand"><span>欧</span> 欧记猪肉牧场</div>
           <div className="controls">
+            <a className="top-game-link" href="/game">玩游戏</a>
             <div className="pig-count" aria-live="polite">在场 {pigs.filter((pig) => !pig.grouping).length}</div>
             <button type="button" onClick={() => setSoundOn((value) => !value)} aria-label={soundOn ? "关闭声音" : "开启声音"}>{soundOn ? "声" : "静"}</button>
             <button type="button" onClick={() => setNight((value) => !value)} aria-label={night ? "切换白天" : "切换夜晚"}>{night ? "日" : "月"}</button>
@@ -276,6 +277,11 @@ export default function Home() {
           <span className="logo-copy"><small>OU KEE PORK CO.</small><strong>欧记猪肉</strong><em>用心养 · 放心吃</em></span>
           <span className="logo-pig" aria-hidden="true">豬</span>
         </button>
+        <a className="game-launch" href="/game">
+          <span>NEW · 横版肉鸽试玩</span>
+          <strong>进入《欧桑大逃亡》</strong>
+          <em>今晚不加菜 →</em>
+        </a>
         <p className="tap-hint"><span /> 点击招牌 · 入场赶猪 <span /></p>
         <div className="welcome-stamp">每日<br />新鲜</div>
       </section>
