@@ -145,7 +145,17 @@ button { font: inherit; }
 .instruction small { color: #81612e; }
 
 .pig-layer { position: absolute; z-index: 20; inset: 0; pointer-events: none; }
-.pig { position: absolute; transform-origin: center bottom; animation: pop .5s cubic-bezier(.17,.89,.34,1.35) both, bob 2.4s .5s ease-in-out infinite; filter: drop-shadow(0 8px 3px rgba(51,72,30,.2)); }
+.pig {
+  position: absolute;
+  transform-origin: center bottom;
+  transform: translate(-50%,-50%);
+  animation: wander var(--walk-time) .5s ease-in-out infinite alternate;
+  filter: drop-shadow(0 8px 3px rgba(51,72,30,.2));
+  will-change: transform;
+}
+.pig-shape { position:absolute; inset:0; animation: pig-pop .5s cubic-bezier(.17,.89,.34,1.35) both, pig-bob 1.2s .5s ease-in-out infinite; }
+.pig.grouping { z-index:40; animation: gather-fly 3s cubic-bezier(.45,.04,.22,1) forwards; }
+.pig.grouping .pig-shape { animation: excited .16s ease-in-out infinite alternate; }
 .pig-body { position: absolute; left: 4%; top: 15%; width: 70%; height: 70%; border-radius: 50% 45% 42% 48%; background: var(--pig); border: 2px solid rgba(104,42,43,.32); }
 .pig-head { position: absolute; right: 0; top: 20%; width: 48%; height: 67%; border-radius: 46% 48% 43% 50%; background: var(--pig); border: 2px solid rgba(104,42,43,.32); }
 .pig-ear { position: absolute; z-index: -1; top: -18%; width: 31%; height: 38%; background: var(--pig); border: 2px solid rgba(104,42,43,.32); transform: rotate(25deg); border-radius: 80% 10% 50% 20%; }
@@ -159,6 +169,8 @@ button { font: inherit; }
 .pig-tail { position:absolute; left:-12%; top:22%; width:19%; height:30%; border:4px solid var(--pig); border-left:0; border-radius:0 50% 50% 0; }
 .pig-leg { position:absolute; bottom:-15%; width:13%; height:26%; background:var(--pig); border-radius:0 0 6px 6px; }
 .leg-one{left:18%}.leg-two{right:18%}
+.pig:not(.grouping) .leg-one { animation: trot .32s ease-in-out infinite alternate; }
+.pig:not(.grouping) .leg-two { animation: trot .32s ease-in-out infinite alternate-reverse; }
 .pig-name { position:absolute; left:50%; bottom:-28px; transform:translateX(-50%); padding:3px 8px; border-radius:20px; white-space:nowrap; color:#5b3f29; background:rgba(255,247,219,.86); font-size:10px; font-weight:800; opacity:0; transition:opacity .2s; }
 .pig:hover .pig-name { opacity:1; }
 .pig.golden { filter: drop-shadow(0 0 12px #ffe477) drop-shadow(0 8px 3px rgba(51,72,30,.2)); }
@@ -174,8 +186,21 @@ footer b { color:#fff; }
 .is-night .instruction { color:#e8e0b8; }
 .is-night .farm::before { content:"·  ✦   ·    ✧     ·  ✦       ·    ✧"; position:absolute; z-index:2; inset:10% 10% auto; color:white; font:28px/1 monospace; letter-spacing:5vw; opacity:.8; }
 
-@keyframes pop { from{opacity:0; transform:translate(-50%,-40%) rotate(0) scale(.15)} 70%{transform:translate(-50%,-55%) rotate(0) scale(1.12)} }
-@keyframes bob { 50%{ margin-top:-5px; } }
+@keyframes pig-pop { from{opacity:0; transform:translateY(12px) scale(.15)} 70%{transform:translateY(-5px) scale(1.12)} }
+@keyframes pig-bob { 50%{ margin-top:-4px; } }
+@keyframes wander {
+  from { transform:translate(calc(-50% - var(--walk-x)),calc(-50% - var(--walk-y))) rotate(calc(var(--rot) - 3deg)); }
+  to { transform:translate(calc(-50% + var(--walk-x)),calc(-50% + var(--walk-y))) rotate(calc(var(--rot) + 3deg)); }
+}
+@keyframes gather-fly {
+  0% { transform:translate(-50%,-50%) rotate(var(--rot)) scale(1); }
+  18% { transform:translate(calc(-50% + var(--group-x)),calc(-50% + var(--group-y))) rotate(0) scale(1.08); }
+  38% { transform:translate(calc(-50% + var(--group-x)),calc(-50% + var(--group-y) - 14px)) rotate(-8deg) scale(1.12); }
+  48% { transform:translate(calc(-50% + var(--group-x)),calc(-50% + var(--group-y))) rotate(8deg) scale(1.12); }
+  100% { transform:translate(calc(-50% + var(--group-x) + var(--fly-x)),calc(-50% + var(--group-y) - 68vh)) rotate(720deg) scale(.28); }
+}
+@keyframes excited { to{transform:translateY(-7px) rotate(5deg)} }
+@keyframes trot { to{transform:translateY(4px) rotate(7deg)} }
 @keyframes bubble { from{opacity:0; transform:translate(-50%,0) scale(.4)} 30%{opacity:1} to{opacity:0; transform:translate(-50%,-60px) scale(1.1)} }
 @keyframes spin { to{transform:rotate(360deg)} }
 @keyframes drift { to{transform:translateX(45px)} }
