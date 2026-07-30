@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#170f15" />
+    <meta name="description" content="欧桑大逃亡像素版：一个会喊欧桑的横版动作肉鸽游戏。看准预警，完美冲刺，救出彩色猪队友。" />
+    <meta property="og:title" content="欧桑大逃亡 · 今晚不加菜" />
+    <meta property="og:description" content="精致像素横版动作肉鸽：冲出农场，完美冲刺，凑齐彩猪，四连共鸣。" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="./key-art.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="欧桑大逃亡" />
+    <title>欧桑大逃亡 · 今晚不加菜</title>
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="./app-icon.png" />
+    <link rel="stylesheet" href="./game.css" />
+  </head>
+  <body>
+    <main class="game-shell" id="game-shell">
+      <canvas id="game" width="1280" height="720" aria-label="欧桑大逃亡横版动作游戏"></canvas>
+
+      <section class="title-screen" id="title-screen">
+        <div class="title-shade"></div>
+        <div class="title-squad" aria-hidden="true">
+          <i class="title-sprite hero-sprite"></i>
+          <i class="title-sprite buddy-sprite buddy-orange"></i>
+          <i class="title-sprite buddy-sprite buddy-mint"></i>
+          <i class="title-sprite buddy-sprite buddy-blue"></i>
+        </div>
+        <div class="title-copy">
+          <div class="eyebrow"><span></span> 欧记猪肉宇宙 · PIXEL ROGUELITE <span></span></div>
+          <h1>欧桑大逃亡</h1>
+          <p class="subtitle">今晚不加菜</p>
+          <p class="pitch">看准预警，撞碎守卫，也撞碎挡路的设施。<br />随机障碍、五区追逃、同色四只离谱共鸣。</p>
+          <button class="primary-button" id="start-button" type="button">
+            <b>开始逃亡</b><small>ENTER / 轻触</small>
+          </button>
+          <button class="install-button" id="install-button" type="button" hidden>
+            <b>安装应用版</b><small>离线游玩 · 全屏启动</small>
+          </button>
+          <div class="controls-card">
+            <span><kbd>A D</kbd> 移动</span>
+            <span><kbd>空格</kbd> 跳跃</span>
+            <span><kbd>J</kbd> 撞击</span>
+            <span><kbd>K</kbd> 冲刺</span>
+            <span><kbd>Q</kbd> 欧桑吼</span>
+          </div>
+          <p class="headphones">建议打开声音 · 原创 AI 配乐与“欧桑”已就位</p>
+        </div>
+        <a class="back-link" href="../">← 返回养猪场</a>
+      </section>
+
+      <header class="hud" id="hud" aria-live="polite">
+        <div class="brand-chip"><span>欧</span><b>逃亡中</b></div>
+        <div class="health-wrap">
+          <div class="hud-label"><span>生命</span><b id="hp-text">100 / 100</b></div>
+          <div class="health-bar"><i id="hp-bar"></i></div>
+        </div>
+        <div class="room-chip">
+          <small id="area-name">青禾农场</small>
+          <b id="room-text">第 1 / 5 关</b>
+        </div>
+        <div class="coin-chip"><span>◈</span><b id="coin-text">0</b></div>
+        <div class="combo-chip"><small>连击</small><b id="combo-text">×0</b></div>
+        <div class="threat-chip" title="停留越久，厂区警戒越高">
+          <small>厂区警戒</small><b id="threat-text">摸鱼</b>
+          <i><em id="threat-bar"></em></i>
+        </div>
+        <button class="sound-toggle" id="sound-toggle" type="button" aria-label="关闭声音">♫</button>
+      </header>
+
+      <aside class="flock-panel" id="flock-panel">
+        <div class="flock-title"><b>彩猪小队</b><small>同色 ×4 触发共鸣</small></div>
+        <div class="flock-grid" id="flock-grid"></div>
+      </aside>
+
+      <div class="boss-wrap" id="boss-wrap">
+        <div><span id="boss-name">分拣队长 · 铁斗笠</span><b id="boss-hp-text">100%</b></div>
+        <i><em id="boss-bar"></em></i>
+      </div>
+
+      <div class="skill-chip" id="skill-chip">
+        <b>Q</b><span>欧桑吼<small id="skill-status">准备就绪</small></span>
+      </div>
+
+      <div class="action-tip" id="action-tip">
+        <b>!</b><span>红光出现时冲刺；重击可打碎路障，扫描门与活塞需要看准节奏</span>
+      </div>
+
+      <section class="upgrade-screen" id="upgrade-screen" aria-label="选择一项本关奖励">
+        <div class="upgrade-box">
+          <p class="eyebrow"><span></span> 逃亡补给 <span></span></p>
+          <h2>选一件，继续跑</h2>
+          <div class="upgrade-cards" id="upgrade-cards"></div>
+          <small class="upgrade-hint">点击卡牌或按 1 / 2 / 3</small>
+        </div>
+      </section>
+
+      <section class="end-screen" id="end-screen">
+        <div class="end-box">
+          <p class="eyebrow"><span></span> <b id="end-kicker">本次逃亡结束</b> <span></span></p>
+          <h2 id="end-title">今晚还是加菜了</h2>
+          <p id="end-copy">没关系，欧桑还会再来。</p>
+          <div class="run-stats" id="run-stats"></div>
+          <button class="primary-button" id="restart-button" type="button"><b>再逃一次</b><small>R / 轻触</small></button>
+          <a href="../">回养猪场散散心</a>
+        </div>
+      </section>
+
+      <div class="toast" id="toast"></div>
+      <div class="comic-word" id="comic-word"></div>
+
+      <nav class="touch-controls" aria-label="手机游戏控制">
+        <div class="touch-left">
+          <button data-key="ArrowLeft" aria-label="向左">◀</button>
+          <button data-key="ArrowRight" aria-label="向右">▶</button>
+        </div>
+        <div class="touch-right">
+          <button class="jump" data-key="Space" aria-label="跳跃">跳</button>
+          <button class="attack" data-key="KeyJ" aria-label="撞击">撞</button>
+          <button class="dash" data-key="KeyK" aria-label="冲刺">冲</button>
+          <button class="shout" data-key="KeyQ" aria-label="欧桑吼">欧</button>
+        </div>
+      </nav>
+    </main>
+    <script src="./game.js"></script>
+  </body>
+</html>

@@ -4,7 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#9f1f24" />
-    <meta name="description" content="点击招牌进入欧记趣味养猪场，召唤会散步、会抱团起飞的彩色小猪。" />
+    <meta name="description" content="点击招牌进入欧记趣味养猪场，召唤彩色小猪；同色四只会集合并飞进隔壁的欧记屠宰场。" />
+    <meta property="og:title" content="欧记猪肉 · 欧桑养猪场" />
+    <meta property="og:description" content="点击召唤彩色猪猪，同色四只集合进厂。戴上耳机，听 AI 欧桑与牧场小曲。" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://lbnb159936-hub.github.io/ou-kee-pig-farm/" />
+    <meta property="og:image" content="https://lbnb159936-hub.github.io/ou-kee-pig-farm/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
     <title>欧记猪肉 · 欧桑养猪场</title>
     <link rel="stylesheet" href="./style.css" />
   </head>
@@ -23,6 +29,17 @@
           <div class="barn-roof"></div>
           <div class="barn-body"><span class="barn-mark">欧</span><div class="barn-door"></div></div>
         </div>
+        <div class="slaughterhouse" id="slaughterhouse" aria-label="欧记屠宰场，卡通场景，无血腥内容">
+          <div class="factory-chimney"><i></i><i></i><i></i></div>
+          <div class="factory-roof"></div>
+          <div class="factory-body">
+            <span class="warning-light"></span>
+            <div class="factory-sign"><small>OU KEE WORKS</small><strong>欧记屠宰场</strong></div>
+            <div class="factory-door"><span>猪猪入口</span></div>
+            <div class="factory-conveyor"></div>
+          </div>
+          <div class="factory-status" id="factory-status">今日开工</div>
+        </div>
         <div class="windmill" aria-hidden="true">
           <div class="windmill-wheel"><i></i><i></i><i></i><i></i></div>
           <div class="windmill-post"></div>
@@ -33,16 +50,19 @@
         <header class="farm-topbar">
           <div class="mini-brand"><span>欧</span> 欧记猪肉牧场</div>
           <div class="controls">
+            <a class="top-game-link" href="./game/" aria-label="进入欧桑大逃亡横版游戏">玩游戏</a>
             <div class="pig-count" id="pig-count" aria-live="polite">在场 0</div>
+            <div class="pig-count processed-count">进厂 <b id="processed-count">0</b></div>
+            <button type="button" id="music-button" aria-label="关闭背景音乐">乐</button>
             <button type="button" id="sound-button" aria-label="关闭声音">声</button>
             <button type="button" id="night-button" aria-label="切换夜晚">月</button>
           </div>
         </header>
 
         <div class="instruction">
-          <span>轻点牧场 · 召唤彩色小猪</span>
-          <strong>同色四只，抱团起飞</strong>
-          <small>小猪会自己散步，听见猪叫就抬头看</small>
+          <span>轻点牧场 · 召唤会唱歌的彩色小猪</span>
+          <strong>同色四只，集合进厂</strong>
+          <small>第 17 只是金猪，会让隔壁停工检查 8 秒</small>
         </div>
 
         <div class="pig-layer" id="pig-layer" aria-live="polite"></div>
@@ -61,6 +81,11 @@
           </span>
           <span class="logo-pig" aria-hidden="true">豬</span>
         </button>
+        <a class="game-launch" href="./game/">
+          <span>NEW · 横版肉鸽试玩</span>
+          <strong>进入《欧桑大逃亡》</strong>
+          <em>今晚不加菜 →</em>
+        </a>
         <p class="tap-hint"><span></span> 点击招牌 · 入场赶猪 <span></span></p>
         <div class="welcome-stamp">每日<br />新鲜</div>
       </section>

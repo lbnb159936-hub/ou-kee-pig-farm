@@ -91,6 +91,12 @@ button { font: inherit; }
 
 .tap-hint { display: flex; align-items: center; gap: 14px; margin: 0; color: #79532d; letter-spacing: .2em; font-weight: 700; animation: breathe 1.8s ease-in-out infinite; }
 .tap-hint span { width: 34px; height: 1px; background: currentColor; }
+.game-launch { display:grid; grid-template-columns:auto auto; align-items:center; gap:2px 22px; width:min(470px,84vw); padding:13px 17px; color:#fff3ce; border:2px solid #6f181c; background:linear-gradient(135deg,#ac282d,#7d1c22); box-shadow:5px 5px 0 rgba(88,43,19,.25); text-decoration:none; transform:rotate(.6deg); transition:transform .18s,box-shadow .18s; }
+.game-launch span { grid-column:1; color:#efc77d; font:800 9px/1 Arial,sans-serif; letter-spacing:.15em; }
+.game-launch strong { grid-column:1; font-size:17px; letter-spacing:.08em; }
+.game-launch em { grid-column:2; grid-row:1/3; font-style:normal; font-weight:900; }
+.game-launch:hover { transform:translateY(-3px) rotate(0); box-shadow:7px 8px 0 rgba(88,43,19,.28); }
+.top-game-link { display:grid; place-items:center; height:42px; padding:0 15px; border:1px solid rgba(255,239,190,.75); border-radius:999px; color:#fff2c7; background:#a4252a; font:800 12px/1 Arial,sans-serif; text-decoration:none; letter-spacing:.08em; pointer-events:auto; }
 .welcome-stamp { position: absolute; right: 5vw; bottom: 5vh; padding: 12px; color: var(--red); border: 2px solid; border-radius: 50%; text-align: center; font-weight: 800; transform: rotate(13deg); }
 
 .farm {
@@ -212,9 +218,11 @@ footer b { color:#fff; }
   .logo-copy { text-align:center; }.logo-copy strong{font-size:clamp(52px,17vw,80px)}.logo-copy em{font-size:11px;letter-spacing:.4em}.logo-copy small{font-size:10px}
   .seal { width:72px; font-size:46px; }
   .welcome-kicker { font-size:10px; letter-spacing:.25em; }
+  .game-launch { padding:10px 13px; }.game-launch strong{font-size:14px}.game-launch em{font-size:12px}
   .welcome-stamp { display:none; }
   .farm-topbar { inset:12px 12px auto; }.mini-brand{font-size:12px}.mini-brand span{width:32px;height:32px}
   .pig-count { padding:0 10px; }.controls button,.pig-count{height:36px;min-width:36px}
+  .top-game-link{height:36px;padding:0 10px;font-size:10px}
   .instruction { top:13%; width:90%; }.instruction strong{font-size:24px}
   .barn { width:175px; bottom:35%; left:2%; }.barn-body{height:115px}.barn-roof{height:48px}.barn-door{height:48px}.barn-mark{width:34px;height:34px;font-size:20px;top:8px}
   .windmill { right:2%; bottom:39%; transform:scale(.72); transform-origin:bottom; }
