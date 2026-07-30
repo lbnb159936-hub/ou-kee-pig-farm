@@ -28,11 +28,15 @@
   const comboChip = document.querySelector(".combo-chip");
   const threatText = document.querySelector("#threat-text");
   const threatBar = document.querySelector("#threat-bar");
+  const installButton = document.querySelector("#install-button");
 
   const W = canvas.width;
   const H = canvas.height;
   const GROUND = 588;
   const WORLD_WIDTH = 3200;
+  const SIM_STEP = 1 / 60;
+  const MAX_SIM_STEPS = 4;
+  const MAX_PARTICLES = 420;
   ctx.imageSmoothingEnabled = false;
 
   const spriteAtlas = new Image();
@@ -92,6 +96,11 @@
   const keys = new Set();
   let mode = "title";
   let lastTime = 0;
+  let accumulator = 0;
+  let pageVisible = true;
+  let effectQuality = 1;
+  let perfFrames = 0;
+  let perfStarted = performance.now();
   let cameraX = 0;
   let room = 0;
   let roomCleared = false;
@@ -122,6 +131,7 @@
   let combo = 0;
   let comboTimer = 0;
   let perfectDodges = 0;
+  let deferredInstall = null;
 
   function makePlayer() {
     return {
@@ -473,6 +483,7 @@
   }
 
   function burst(x, y, color, count=10, speed=180) {
+    count = Math.min(Math.ceil(count*effectQuality), Math.max(0,MAX_PARTICLES-particles.length));
     for (let i=0; i<count; i++) {
       const a = Math.random() * Math.PI * 2;
       const s = speed * (.35 + Math.random() * .65);
@@ -680,7 +691,7 @@
     if (player.dashTimer > 0) {
       player.vx = player.facing * 930;
       player.vy *= .72;
-      particles.push({x:player.x+player.w/2,y:player.y+player.h/2,vx:-player.facing*80,vy:(Math.random()-.5)*80,life:.25,maxLife:.25,color:"#f7d7a0",size:7+Math.random()*7});
+      if(particles.length<MAX_PARTICLES&&Math.random()<effectQuality)particles.push({x:player.x+player.w/2,y:player.y+player.h/2,vx:-player.facing*80,vy:(Math.random()-.5)*80,life:.25,maxLife:.25,color:"#f7d7a0",size:7+Math.random()*7});
     } else {
       const target = axis * player.speed;
       player.vx += (target - player.vx) * Math.min(1, dt * (player.grounded ? 12 : 6));
@@ -1073,10 +1084,15 @@
     ctx.restore();
   }
 
+  function visibleX(x,w=0,pad=180){
+    return x+w>=cameraX-pad&&x<=cameraX+W+pad;
+  }
+
   function drawWorld() {
     ctx.save();
     ctx.translate(-cameraX,0);
     for(const s of scenery) {
+      if(!visibleX(s.x,80))continue;
       const a=areas[room];
       ctx.globalAlpha=.35;
       ctx.fillStyle=a.kind==="farm"?(s.kind%2?"#315a35":"#dfb55f"):(s.kind%2?a.accent:"#17151b");
@@ -1085,20 +1101,21 @@
     }
     ctx.globalAlpha=1;
     for(const p of platforms) {
+      if(!visibleX(p.x,p.w))continue;
       ctx.fillStyle=room<2?"#6b5038":"#38373e";ctx.fillRect(p.x,p.y,p.w,p.h);
       ctx.fillStyle=areas[room].accent;ctx.fillRect(p.x,p.y,p.w,6);
       ctx.fillStyle="rgba(255,255,255,.1)";for(let x=p.x+12;x<p.x+p.w;x+=32)ctx.fillRect(x,p.y+9,12,3);
       for(let x=p.x+20;x<p.x+p.w-10;x+=46){ctx.fillStyle="rgba(0,0,0,.2)";ctx.fillRect(x,p.y+p.h,8,30);}
     }
-    for(const o of obstacles)drawObstacle(o);
-    if(roomCleared&&room<4)drawExitGate(WORLD_WIDTH-155,GROUND-155);
-    for(const p of pickups)drawPickup(p);
-    for(const e of enemies)drawEnemy(e);
-    for(const p of projectiles)drawProjectile(p);
+    for(const o of obstacles)if(visibleX(o.x,o.w))drawObstacle(o);
+    if(roomCleared&&room<4&&visibleX(WORLD_WIDTH-155,100))drawExitGate(WORLD_WIDTH-155,GROUND-155);
+    for(const p of pickups)if(visibleX(p.x,30))drawPickup(p);
+    for(const e of enemies)if(visibleX(e.x,e.w,260))drawEnemy(e);
+    for(const p of projectiles)if(visibleX(p.x,p.w,80))drawProjectile(p);
     drawPlayer(player);
-    for(const p of particles){ctx.globalAlpha=Math.max(0,p.life/p.maxLife);ctx.fillStyle=p.color;const s=Math.max(2,Math.round(p.size));ctx.fillRect(Math.round(p.x-s/2),Math.round(p.y-s/2),s,s);}
+    for(const p of particles){if(!visibleX(p.x,p.size,80))continue;ctx.globalAlpha=Math.max(0,p.life/p.maxLife);ctx.fillStyle=p.color;const s=Math.max(2,Math.round(p.size));ctx.fillRect(Math.round(p.x-s/2),Math.round(p.y-s/2),s,s);}
     ctx.globalAlpha=1;
-    for(const f of floaters){ctx.globalAlpha=f.life/f.maxLife;ctx.fillStyle=f.color;ctx.font="900 18px monospace";ctx.textAlign="center";ctx.fillText(f.text,f.x,f.y);}
+    for(const f of floaters){if(!visibleX(f.x,40,80))continue;ctx.globalAlpha=f.life/f.maxLife;ctx.fillStyle=f.color;ctx.font="900 18px monospace";ctx.textAlign="center";ctx.fillText(f.text,f.x,f.y);}
     ctx.globalAlpha=1;ctx.textAlign="left";
     ctx.restore();
   }
@@ -1298,10 +1315,23 @@
   }
 
   function loop(now) {
-    const dt=Math.min(.033,(now-lastTime)/1000||0);
+    if(!pageVisible){lastTime=now;requestAnimationFrame(loop);return;}
+    const dt=Math.min(.08,(now-lastTime)/1000||0);
     lastTime=now;
-    update(dt);
+    accumulator=Math.min(.12,accumulator+dt);
+    let steps=0;
+    while(accumulator>=SIM_STEP&&steps<MAX_SIM_STEPS){
+      update(SIM_STEP);
+      accumulator-=SIM_STEP;
+      steps++;
+    }
     draw();
+    perfFrames++;
+    if(now-perfStarted>=2000){
+      const fps=perfFrames*1000/(now-perfStarted);
+      effectQuality=fps<46?.5:fps<55?.72:1;
+      perfFrames=0;perfStarted=now;
+    }
     requestAnimationFrame(loop);
   }
 
@@ -1317,6 +1347,14 @@
   },{passive:false});
   window.addEventListener("keyup",e=>keys.delete(e.code));
   window.addEventListener("blur",()=>keys.clear());
+  document.addEventListener("visibilitychange",()=>{
+    pageVisible=!document.hidden;
+    keys.clear();
+    accumulator=0;
+    lastTime=performance.now();
+    if(!pageVisible)musicAudio?.pause();
+    else if(soundOn&&mode==="playing")musicAudio?.play().catch(()=>{});
+  });
 
   startButton.addEventListener("click",startGame);
   restartButton.addEventListener("click",startGame);
@@ -1325,6 +1363,31 @@
     soundOn=!soundOn;soundToggle.textContent=soundOn?"♫":"×";soundToggle.setAttribute("aria-label",soundOn?"关闭声音":"开启声音");
     if(!soundOn){voiceAudio?.pause();musicAudio?.pause();if(audioCtx)audioCtx.suspend();}else{ensureAudio();startMusic();}
   });
+
+  const standalone=window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone===true;
+  if(!standalone)installButton.hidden=false;
+  window.addEventListener("beforeinstallprompt",e=>{
+    e.preventDefault();
+    deferredInstall=e;
+    installButton.hidden=false;
+  });
+  installButton.addEventListener("click",async()=>{
+    if(deferredInstall){
+      deferredInstall.prompt();
+      const choice=await deferredInstall.userChoice;
+      if(choice.outcome==="accepted")installButton.hidden=true;
+      deferredInstall=null;
+    }else{
+      showToast(/iphone|ipad|ipod/i.test(navigator.userAgent)?"点击浏览器分享按钮，再选“添加到主屏幕”":"打开浏览器菜单，选择“安装欧桑大逃亡”");
+    }
+  });
+  window.addEventListener("appinstalled",()=>{
+    installButton.hidden=true;
+    showToast("应用版安装完成，可以离线逃亡了！");
+  });
+  if("serviceWorker" in navigator){
+    window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+  }
 
   document.querySelectorAll(".touch-controls button").forEach(btn=>{
     const code=btn.dataset.key;

@@ -1,0 +1,23 @@
+{
+  "name": "欧桑大逃亡：今晚不加菜",
+  "short_name": "欧桑大逃亡",
+  "description": "原创像素横版肉鸽游戏：冲出农场，躲过工厂守卫，救下彩猪小队。",
+  "id": "./",
+  "start_url": "./?source=app",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "landscape",
+  "background_color": "#120c11",
+  "theme_color": "#8f2529",
+  "categories": ["games", "entertainment"],
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "./app-icon.png",
+      "sizes": "1254x1254",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
