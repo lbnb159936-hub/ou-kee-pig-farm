@@ -50,6 +50,12 @@ test("serves the game route and keeps all playable assets", async () => {
     access(new URL("game.js", gameRoot)),
     access(new URL("key-art.png", gameRoot)),
     access(new URL("sprites-v2.png", gameRoot)),
+    access(new URL("backgrounds-v3.png", gameRoot)),
+    access(new URL("audio/music-meadow.wav", gameRoot)),
+    access(new URL("audio/music-chase.wav", gameRoot)),
+    access(new URL("audio/music-boss.wav", gameRoot)),
+    access(new URL("audio/hit-heavy.wav", gameRoot)),
+    access(new URL("audio/boss-slam.wav", gameRoot)),
     access(new URL("../audio/ousang-lively.mp3", gameRoot)),
   ]);
 
@@ -64,4 +70,7 @@ test("serves the game route and keeps all playable assets", async () => {
   assert.match(gameScript, /function openUpgrade/);
   assert.match(gameScript, /function drawAtlas/);
   assert.match(gameScript, /function beginWindup/);
+  assert.match(gameScript, /function createObstacles/);
+  assert.match(gameScript, /function damageObstacle/);
+  assert.match(gameScript, /backgrounds-v3\.png/);
 });
