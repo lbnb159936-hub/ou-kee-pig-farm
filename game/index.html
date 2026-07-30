@@ -4,9 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#170f15" />
-    <meta name="description" content="欧桑大逃亡：一个会喊欧桑的横版动作肉鸽游戏。救出彩色猪队友，同色四只触发共鸣。" />
+    <meta name="description" content="欧桑大逃亡像素版：一个会喊欧桑的横版动作肉鸽游戏。看准预警，完美冲刺，救出彩色猪队友。" />
     <meta property="og:title" content="欧桑大逃亡 · 今晚不加菜" />
-    <meta property="og:description" content="横版动作肉鸽试玩版：冲出农场，凑齐彩猪，四连共鸣。" />
+    <meta property="og:description" content="精致像素横版动作肉鸽：冲出农场，完美冲刺，凑齐彩猪，四连共鸣。" />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="./key-art.png" />
     <title>欧桑大逃亡 · 今晚不加菜</title>
@@ -18,11 +18,17 @@
 
       <section class="title-screen" id="title-screen">
         <div class="title-shade"></div>
+        <div class="title-squad" aria-hidden="true">
+          <i class="title-sprite hero-sprite"></i>
+          <i class="title-sprite buddy-sprite buddy-orange"></i>
+          <i class="title-sprite buddy-sprite buddy-mint"></i>
+          <i class="title-sprite buddy-sprite buddy-blue"></i>
+        </div>
         <div class="title-copy">
-          <div class="eyebrow"><span></span> 欧记猪肉宇宙 · 肉鸽试玩版 <span></span></div>
+          <div class="eyebrow"><span></span> 欧记猪肉宇宙 · PIXEL ROGUELITE <span></span></div>
           <h1>欧桑大逃亡</h1>
           <p class="subtitle">今晚不加菜</p>
-          <p class="pitch">冲出农场，救下彩猪。<br />同色四只，发动离谱共鸣。</p>
+          <p class="pitch">看准预警，撞碎守卫，救下彩猪。<br />同色四只，发动离谱共鸣。</p>
           <button class="primary-button" id="start-button" type="button">
             <b>开始逃亡</b><small>ENTER / 轻触</small>
           </button>
@@ -49,6 +55,11 @@
           <b id="room-text">第 1 / 5 关</b>
         </div>
         <div class="coin-chip"><span>◈</span><b id="coin-text">0</b></div>
+        <div class="combo-chip"><small>连击</small><b id="combo-text">×0</b></div>
+        <div class="threat-chip" title="停留越久，厂区警戒越高">
+          <small>厂区警戒</small><b id="threat-text">摸鱼</b>
+          <i><em id="threat-bar"></em></i>
+        </div>
         <button class="sound-toggle" id="sound-toggle" type="button" aria-label="关闭声音">♫</button>
       </header>
 
@@ -64,6 +75,10 @@
 
       <div class="skill-chip" id="skill-chip">
         <b>Q</b><span>欧桑吼<small id="skill-status">准备就绪</small></span>
+      </div>
+
+      <div class="action-tip" id="action-tip">
+        <b>!</b><span>红光出现时冲刺，可穿过攻击并反撞敌人</span>
       </div>
 
       <section class="upgrade-screen" id="upgrade-screen" aria-label="选择一项本关奖励">
