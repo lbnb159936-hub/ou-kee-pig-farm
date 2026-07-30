@@ -15,15 +15,31 @@ const pigCount = document.querySelector("#pig-count");
 const farmStatus = document.querySelector("#farm-status");
 const soundButton = document.querySelector("#sound-button");
 const nightButton = document.querySelector("#night-button");
+const musicButton = document.querySelector("#music-button");
+const processedCount = document.querySelector("#processed-count");
+const slaughterhouse = document.querySelector("#slaughterhouse");
+const factoryStatus = document.querySelector("#factory-status");
 
 let entered = false;
 let soundOn = true;
+let musicOn = true;
 let night = false;
 let pigs = [];
 let count = 0;
-let speechToken = 0;
+let processed = 0;
 let audioContext = null;
 let bubble = null;
+let aiVoice = null;
+let musicTimer = null;
+let musicStep = 0;
+let shutdownTimer = null;
+let factoryShutdown = false;
+
+const aiVoiceClips = [
+  "./audio/ousang-lively.mp3",
+  "./audio/ousang-cute.mp3",
+  "./audio/ousang-passion.mp3",
+];
 
 function updateCount() {
   const active = pigs.filter((pig) => !pig.grouping).length;
@@ -45,9 +61,8 @@ function showBubble(x, y, text, duration = 1050) {
   }, duration);
 }
 
-function speakOusang() {
-  if (!soundOn || !("speechSynthesis" in window)) return;
-  const token = ++speechToken;
+function fallbackOusang() {
+  if (!("speechSynthesis" in window)) return;
   const contours = [
     { first: 0.72, second: 1.35, rate: 0.72 },
     { first: 1.28, second: 0.78, rate: 0.8 },
@@ -69,10 +84,76 @@ function speakOusang() {
   second.rate = contour.rate + 0.08;
   second.pitch = contour.second;
   window.speechSynthesis.cancel();
-  first.onend = () => {
-    if (speechToken === token) window.speechSynthesis.speak(second);
-  };
+  first.onend = () => window.speechSynthesis.speak(second);
   window.speechSynthesis.speak(first);
+}
+
+function speakOusang() {
+  if (!soundOn) return;
+  aiVoice?.pause();
+  aiVoice = new Audio(aiVoiceClips[count % aiVoiceClips.length]);
+  aiVoice.volume = 0.92;
+  aiVoice.playbackRate = 0.94 + Math.random() * 0.11;
+  aiVoice.play().catch(fallbackOusang);
+}
+
+function ensureAudioContext() {
+  if (!("AudioContext" in window)) return null;
+  audioContext ||= new AudioContext();
+  audioContext.resume();
+  return audioContext;
+}
+
+function playMusicNote(frequency, when, length, volume, type = "triangle") {
+  const context = ensureAudioContext();
+  if (!context) return;
+  const oscillator = context.createOscillator();
+  const gain = context.createGain();
+  oscillator.type = type;
+  oscillator.frequency.setValueAtTime(frequency, when);
+  gain.gain.setValueAtTime(0.0001, when);
+  gain.gain.exponentialRampToValueAtTime(volume, when + 0.025);
+  gain.gain.exponentialRampToValueAtTime(0.0001, when + length);
+  oscillator.connect(gain);
+  gain.connect(context.destination);
+  oscillator.start(when);
+  oscillator.stop(when + length + 0.03);
+}
+
+function playMusicBeat() {
+  if (!musicOn || !entered) return;
+  const context = ensureAudioContext();
+  if (!context) return;
+  const melody = [261.63, 329.63, 392, 329.63, 440, 392, 329.63, 293.66];
+  const when = context.currentTime + 0.02;
+  playMusicNote(melody[musicStep % melody.length], when, 0.32, 0.026);
+  if (musicStep % 2 === 0) playMusicNote(130.81, when, 0.48, 0.012, "sine");
+  if (musicStep % 4 === 2) playMusicNote(196, when, 0.22, 0.009, "sine");
+  musicStep += 1;
+}
+
+function startMusic() {
+  if (!musicOn || musicTimer) return;
+  playMusicBeat();
+  musicTimer = window.setInterval(playMusicBeat, 430);
+}
+
+function stopMusic() {
+  if (musicTimer) window.clearInterval(musicTimer);
+  musicTimer = null;
+}
+
+function triggerShutdown() {
+  factoryShutdown = true;
+  slaughterhouse.classList.remove("receiving");
+  slaughterhouse.classList.add("shutdown");
+  factoryStatus.textContent = "金猪检查 · 停工 8 秒";
+  window.clearTimeout(shutdownTimer);
+  shutdownTimer = window.setTimeout(() => {
+    factoryShutdown = false;
+    slaughterhouse.classList.remove("shutdown");
+    factoryStatus.textContent = "检查结束 · 恢复开工";
+  }, 8000);
 }
 
 function pigOink(startAt, pitch) {
@@ -101,8 +182,7 @@ function pigOink(startAt, pitch) {
 
 function playPigChorus() {
   if (!soundOn || !("AudioContext" in window)) return;
-  audioContext ||= new AudioContext();
-  audioContext.resume();
+  ensureAudioContext();
   const now = audioContext.currentTime + 0.03;
   [0, 0.13, 0.27, 0.41].forEach((delay, index) => pigOink(now + delay, 0.9 + index * 0.08));
 }
@@ -151,19 +231,29 @@ function makePigElement(pig) {
 function groupAndFly(flock, color) {
   const centerX = flock.reduce((sum, pig) => sum + pig.x, 0) / 4;
   const centerY = flock.reduce((sum, pig) => sum + pig.y, 0) / 4;
-  const flyX = centerX < 50 ? 115 : -115;
+  const factoryX = 86.5;
+  const factoryY = 66;
   flock.forEach((pig) => {
     pig.grouping = true;
     pig.element.classList.add("grouping");
     pig.element.style.setProperty("--group-x", `${centerX - pig.x}vw`);
     pig.element.style.setProperty("--group-y", `${centerY - pig.y}vh`);
-    pig.element.style.setProperty("--fly-x", `${flyX}vw`);
+    pig.element.style.setProperty("--factory-x", `${factoryX - pig.x}vw`);
+    pig.element.style.setProperty("--factory-y", `${factoryY - pig.y}vh`);
   });
-  showBubble(centerX, centerY - 8, `${color.label}四连！起飞！`, 2500);
+  showBubble(centerX, centerY - 8, `${color.label}四连！欧记来车！`, 2500);
   window.setTimeout(playPigChorus, 620);
+  window.setTimeout(() => {
+    slaughterhouse.classList.add("receiving");
+    factoryStatus.textContent = `${color.label}猪猪入厂中`;
+  }, 1550);
   window.setTimeout(() => {
     flock.forEach((pig) => pig.element.remove());
     pigs = pigs.filter((pig) => !flock.includes(pig));
+    processed += 4;
+    processedCount.textContent = String(processed);
+    slaughterhouse.classList.remove("receiving");
+    factoryStatus.textContent = `本日已接收 ${processed} 只`;
     updateCount();
   }, 3000);
 }
@@ -195,8 +285,13 @@ function addPig(event) {
   const matching = pigs.filter((item) =>
     item !== pig && !item.grouping && !item.golden && item.color.key === color.key
   ).slice(-3);
-  if (!golden && matching.length === 3) {
+  if (golden) {
+    triggerShutdown();
+    showBubble(x, y - 11, "金猪巡厂！全线停工！", 2300);
+  } else if (!factoryShutdown && matching.length === 3) {
     groupAndFly([...matching, pig], color);
+  } else if (factoryShutdown && matching.length >= 3) {
+    showBubble(x, y - 10, "停工检查中，猪猪暂缓入厂！", 1800);
   } else {
     const cries = ["欧↗桑！", "欧～桑↘", "欧↘桑↗！", "欧——桑！"];
     showBubble(x, y - 10, cries[count % cries.length]);
@@ -216,13 +311,25 @@ document.querySelector("#enter-button").addEventListener("click", () => {
   entered = true;
   site.classList.add("is-entered");
   window.setTimeout(speakOusang, 250);
+  startMusic();
 });
 
 soundButton.addEventListener("click", () => {
   soundOn = !soundOn;
   soundButton.textContent = soundOn ? "声" : "静";
   soundButton.setAttribute("aria-label", soundOn ? "关闭声音" : "开启声音");
-  if (!soundOn) window.speechSynthesis?.cancel();
+  if (!soundOn) {
+    window.speechSynthesis?.cancel();
+    aiVoice?.pause();
+  }
+});
+
+musicButton.addEventListener("click", () => {
+  musicOn = !musicOn;
+  musicButton.textContent = musicOn ? "乐" : "停";
+  musicButton.setAttribute("aria-label", musicOn ? "关闭背景音乐" : "开启背景音乐");
+  if (musicOn) startMusic();
+  else stopMusic();
 });
 
 nightButton.addEventListener("click", () => {

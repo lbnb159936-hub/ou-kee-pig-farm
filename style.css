@@ -120,6 +120,8 @@ button { font: inherit; }
 .controls { display: flex; gap: 8px; pointer-events: auto; }
 .controls button, .pig-count { border: 1px solid rgba(255,255,255,.5); border-radius: 999px; background: rgba(67,69,35,.48); color: white; backdrop-filter: blur(10px); height: 42px; min-width: 42px; display: grid; place-items: center; cursor: pointer; }
 .pig-count { padding: 0 16px; font: 700 13px/1 Arial, sans-serif; letter-spacing: .08em; }
+.processed-count { background:rgba(134,30,32,.78); }
+.processed-count b { margin-left:6px; font-size:15px; }
 .controls button:hover { background: var(--red); }
 
 .barn { position: absolute; z-index: 4; width: min(290px, 28vw); left: 7%; bottom: 33%; pointer-events: none; filter: drop-shadow(0 18px 10px rgba(42,58,22,.2)); }
@@ -128,7 +130,7 @@ button { font: inherit; }
 .barn-mark { position: absolute; left: 50%; top: 20px; transform: translateX(-50%); width: 46px; height: 46px; display: grid; place-items: center; color: white; border: 3px solid; border-radius: 50%; font-weight: 800; font-size: 28px; }
 .barn-door { position: absolute; width: 40%; height: 75px; left: 30%; bottom: 0; background: #682a28; border: 5px solid #f3dfb6; border-bottom: 0; }
 
-.windmill { position: absolute; z-index: 3; right: 9%; bottom: 38%; pointer-events: none; }
+.windmill { position: absolute; z-index: 3; right: 28%; bottom: 38%; pointer-events: none; }
 .windmill-post { width: 18px; height: 150px; margin: -5px auto 0; background: linear-gradient(90deg,#ae7644,#e2ad6d,#85552e); clip-path: polygon(35% 0,65% 0,100% 100%,0 100%); }
 .windmill-wheel { position: relative; width: 110px; height: 110px; animation: spin 11s linear infinite; }
 .windmill-wheel::after { content:""; position:absolute; width:18px; height:18px; border-radius:50%; background:#8c2526; left:46px; top:46px; }
@@ -138,6 +140,138 @@ button { font: inherit; }
 .fence { position: absolute; z-index: 5; bottom: 24%; width: 31%; height: 70px; border-top: 12px solid #ead09c; border-bottom: 12px solid #ead09c; transform: skewY(-2deg); pointer-events: none; filter: drop-shadow(0 5px 2px rgba(58,67,29,.18)); }
 .fence::after { content:""; position:absolute; inset:-28px 10% -28px; border-left:18px solid #d5aa68; border-right:18px solid #d5aa68; }
 .fence-left { left:-3%; }.fence-right { right:-3%; transform:skewY(2deg); }
+
+.slaughterhouse {
+  position:absolute;
+  z-index:8;
+  right:2.5%;
+  bottom:27%;
+  width:min(245px,22vw);
+  pointer-events:none;
+  filter:drop-shadow(0 18px 11px rgba(49,38,25,.3));
+}
+.factory-body {
+  position:relative;
+  height:166px;
+  overflow:visible;
+  border:7px solid #ead3a6;
+  background:
+    repeating-linear-gradient(90deg,transparent 0 32px,rgba(67,49,37,.1) 33px 35px),
+    #71685d;
+}
+.factory-roof {
+  width:108%;
+  height:45px;
+  margin-left:-4%;
+  background:#403a35;
+  clip-path:polygon(0 65%,12% 18%,25% 65%,38% 18%,51% 65%,64% 18%,77% 65%,90% 18%,100% 65%,100% 100%,0 100%);
+}
+.factory-chimney {
+  position:absolute;
+  right:18%;
+  top:-58px;
+  width:37px;
+  height:75px;
+  border:5px solid #ead3a6;
+  background:#554b43;
+}
+.factory-chimney i {
+  position:absolute;
+  left:50%;
+  top:-16px;
+  width:25px;
+  height:25px;
+  border-radius:50%;
+  background:rgba(224,216,194,.7);
+  opacity:0;
+}
+.factory-chimney i:nth-child(2){margin-left:12px;top:-38px}
+.factory-chimney i:nth-child(3){margin-left:-8px;top:-60px}
+.slaughterhouse.receiving .factory-chimney i { animation:factory-smoke 1.3s ease-out both; }
+.slaughterhouse.receiving .factory-chimney i:nth-child(2){animation-delay:.18s}
+.slaughterhouse.receiving .factory-chimney i:nth-child(3){animation-delay:.36s}
+.factory-sign {
+  position:absolute;
+  left:8%;
+  right:8%;
+  top:15px;
+  display:grid;
+  gap:3px;
+  padding:8px 4px 7px;
+  color:#f8e7c5;
+  text-align:center;
+  border:3px solid #f0d39f;
+  background:#8f2528;
+  box-shadow:0 5px 0 #4b1d1f;
+}
+.factory-sign small { font:700 8px/1 Arial,sans-serif; letter-spacing:.22em; }
+.factory-sign strong { font-size:clamp(15px,1.7vw,24px); letter-spacing:.08em; }
+.warning-light {
+  position:absolute;
+  z-index:2;
+  right:7px;
+  top:-20px;
+  width:18px;
+  height:18px;
+  border-radius:50% 50% 3px 3px;
+  background:#ff4c3e;
+  box-shadow:0 0 0 4px #352d27,0 0 16px #ff3928;
+}
+.slaughterhouse.receiving .warning-light { animation:warning-flash .22s steps(2) infinite; }
+.factory-door {
+  position:absolute;
+  left:26%;
+  bottom:0;
+  width:48%;
+  height:70px;
+  overflow:hidden;
+  border:5px solid #d9bd8c;
+  border-bottom:0;
+  background:
+    repeating-linear-gradient(135deg,#1f2524 0 10px,#d9ad32 11px 20px);
+}
+.factory-door::after {
+  content:"";
+  position:absolute;
+  inset:25px 7px 0;
+  background:#191c1b;
+  box-shadow:inset 0 0 18px #000;
+}
+.factory-door span {
+  position:relative;
+  z-index:1;
+  display:block;
+  padding-top:5px;
+  color:white;
+  text-align:center;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.12em;
+}
+.factory-conveyor {
+  position:absolute;
+  left:-42%;
+  bottom:-13px;
+  width:72%;
+  height:18px;
+  border:4px solid #403a35;
+  border-radius:10px;
+  background:repeating-linear-gradient(90deg,#c6a675 0 12px,#66584b 13px 16px);
+}
+.factory-status {
+  width:max-content;
+  margin:8px auto 0;
+  padding:5px 12px;
+  color:#fff3d3;
+  border-radius:20px;
+  background:rgba(39,34,30,.76);
+  font:700 10px/1 Arial,sans-serif;
+  letter-spacing:.12em;
+}
+.slaughterhouse.shutdown { filter:grayscale(.85) drop-shadow(0 18px 11px rgba(49,38,25,.3)); }
+.slaughterhouse.shutdown .warning-light { background:#6cc8e8; box-shadow:0 0 0 4px #352d27,0 0 15px #66d7ff; animation:shutdown-pulse .8s ease-in-out infinite alternate; }
+.slaughterhouse.shutdown .factory-door::after { background:#284552; }
+.slaughterhouse.receiving { animation:factory-rumble .12s linear infinite alternate; }
 
 .instruction { position: absolute; z-index: 10; left: 50%; top: 16%; transform: translateX(-50%); display: grid; justify-items: center; color: #345322; text-align: center; pointer-events: none; }
 .instruction span { font-size: 13px; letter-spacing: .3em; }
@@ -154,7 +288,7 @@ button { font: inherit; }
   will-change: transform;
 }
 .pig-shape { position:absolute; inset:0; animation: pig-pop .5s cubic-bezier(.17,.89,.34,1.35) both, pig-bob 1.2s .5s ease-in-out infinite; }
-.pig.grouping { z-index:40; animation: gather-fly 3s cubic-bezier(.45,.04,.22,1) forwards; }
+.pig.grouping { z-index:40; animation: gather-to-factory 3s cubic-bezier(.45,.04,.22,1) forwards; }
 .pig.grouping .pig-shape { animation: excited .16s ease-in-out infinite alternate; }
 .pig-body { position: absolute; left: 4%; top: 15%; width: 70%; height: 70%; border-radius: 50% 45% 42% 48%; background: var(--pig); border: 2px solid rgba(104,42,43,.32); }
 .pig-head { position: absolute; right: 0; top: 20%; width: 48%; height: 67%; border-radius: 46% 48% 43% 50%; background: var(--pig); border: 2px solid rgba(104,42,43,.32); }
@@ -192,15 +326,20 @@ footer b { color:#fff; }
   from { transform:translate(calc(-50% - var(--walk-x)),calc(-50% - var(--walk-y))) rotate(calc(var(--rot) - 3deg)); }
   to { transform:translate(calc(-50% + var(--walk-x)),calc(-50% + var(--walk-y))) rotate(calc(var(--rot) + 3deg)); }
 }
-@keyframes gather-fly {
+@keyframes gather-to-factory {
   0% { transform:translate(-50%,-50%) rotate(var(--rot)) scale(1); }
   18% { transform:translate(calc(-50% + var(--group-x)),calc(-50% + var(--group-y))) rotate(0) scale(1.08); }
   38% { transform:translate(calc(-50% + var(--group-x)),calc(-50% + var(--group-y) - 14px)) rotate(-8deg) scale(1.12); }
   48% { transform:translate(calc(-50% + var(--group-x)),calc(-50% + var(--group-y))) rotate(8deg) scale(1.12); }
-  100% { transform:translate(calc(-50% + var(--group-x) + var(--fly-x)),calc(-50% + var(--group-y) - 68vh)) rotate(720deg) scale(.28); }
+  76% { transform:translate(calc(-50% + var(--factory-x) - 7vw),calc(-50% + var(--factory-y) - 9vh)) rotate(320deg) scale(.78); }
+  100% { transform:translate(calc(-50% + var(--factory-x)),calc(-50% + var(--factory-y))) rotate(720deg) scale(.06); opacity:.35; }
 }
 @keyframes excited { to{transform:translateY(-7px) rotate(5deg)} }
 @keyframes trot { to{transform:translateY(4px) rotate(7deg)} }
+@keyframes factory-rumble { to{transform:translateX(2px) rotate(.3deg)} }
+@keyframes warning-flash { 50%{opacity:.28;transform:scale(.75)} }
+@keyframes shutdown-pulse { to{opacity:.4} }
+@keyframes factory-smoke { 0%{opacity:0;transform:translate(-50%,10px) scale(.45)} 30%{opacity:.75} 100%{opacity:0;transform:translate(-70px,-75px) scale(2.1)} }
 @keyframes bubble { from{opacity:0; transform:translate(-50%,0) scale(.4)} 30%{opacity:1} to{opacity:0; transform:translate(-50%,-60px) scale(1.1)} }
 @keyframes spin { to{transform:rotate(360deg)} }
 @keyframes drift { to{transform:translateX(45px)} }
@@ -213,11 +352,13 @@ footer b { color:#fff; }
   .seal { width:72px; font-size:46px; }
   .welcome-kicker { font-size:10px; letter-spacing:.25em; }
   .welcome-stamp { display:none; }
-  .farm-topbar { inset:12px 12px auto; }.mini-brand{font-size:12px}.mini-brand span{width:32px;height:32px}
-  .pig-count { padding:0 10px; }.controls button,.pig-count{height:36px;min-width:36px}
+  .farm-topbar { inset:10px 10px auto; justify-content:flex-end; }.mini-brand{display:none}
+  .controls{gap:5px}.pig-count { padding:0 8px;font-size:10px }.controls button,.pig-count{height:34px;min-width:34px}
   .instruction { top:13%; width:90%; }.instruction strong{font-size:24px}
   .barn { width:175px; bottom:35%; left:2%; }.barn-body{height:115px}.barn-roof{height:48px}.barn-door{height:48px}.barn-mark{width:34px;height:34px;font-size:20px;top:8px}
-  .windmill { right:2%; bottom:39%; transform:scale(.72); transform-origin:bottom; }
+  .windmill { display:none; }
+  .slaughterhouse { right:1%; bottom:31%; width:138px; transform:scale(.78); transform-origin:right bottom; }
+  .factory-body{height:132px}.factory-door{height:58px}.factory-sign strong{font-size:15px}
   .fence { bottom:24%; }
   footer { left:12px; bottom:10px; }
 }
