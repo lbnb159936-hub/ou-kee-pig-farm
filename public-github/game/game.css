@@ -138,6 +138,25 @@ button { color: inherit; }
 .primary-button small { margin-top: 2px; color: #efc58e; font: 700 9px/1 monospace; letter-spacing: .08em; }
 .primary-button:hover { transform: translate(3px,3px); box-shadow: 4px 4px 0 #32141b; }
 
+.install-button {
+  display: inline-grid;
+  margin-left: 16px;
+  padding: 10px 18px 9px;
+  border: 1px solid rgba(255,229,171,.5);
+  border-radius: 3px;
+  color: #ffe9bd;
+  background: rgba(22,14,19,.8);
+  box-shadow: 3px 3px 0 rgba(0,0,0,.35);
+  cursor: pointer;
+  text-align: left;
+  vertical-align: bottom;
+  transition: border-color .18s, transform .18s, background .18s;
+}
+.install-button[hidden] { display: none; }
+.install-button:hover { transform: translateY(-2px); border-color: #ffe5ab; background: rgba(49,25,30,.94); }
+.install-button b { font-size: 14px; letter-spacing: .1em; }
+.install-button small { margin-top: 3px; color: rgba(255,224,171,.62); font: 700 9px/1 monospace; }
+
 .controls-card {
   display: flex;
   flex-wrap: wrap;
@@ -341,6 +360,7 @@ kbd { padding: 4px 7px; border: 1px solid rgba(255,255,255,.26); border-radius: 
   .subtitle { font-size: 18px; }
   .pitch { display: none; }
   .controls-card { display: none; }
+  .install-button { margin: 14px 0 0; }
   .headphones { margin-top: 13px; }
   .back-link { top: 15px; right: 15px; }
   .hud { inset: 8px 8px auto; gap: 5px; }

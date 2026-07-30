@@ -9,7 +9,12 @@
     <meta property="og:description" content="精致像素横版动作肉鸽：冲出农场，完美冲刺，凑齐彩猪，四连共鸣。" />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="./key-art.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="欧桑大逃亡" />
     <title>欧桑大逃亡 · 今晚不加菜</title>
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="./app-icon.png" />
     <link rel="stylesheet" href="./game.css" />
   </head>
   <body>
@@ -31,6 +36,9 @@
           <p class="pitch">看准预警，撞碎守卫，也撞碎挡路的设施。<br />随机障碍、五区追逃、同色四只离谱共鸣。</p>
           <button class="primary-button" id="start-button" type="button">
             <b>开始逃亡</b><small>ENTER / 轻触</small>
+          </button>
+          <button class="install-button" id="install-button" type="button" hidden>
+            <b>安装应用版</b><small>离线游玩 · 全屏启动</small>
           </button>
           <div class="controls-card">
             <span><kbd>A D</kbd> 移动</span>

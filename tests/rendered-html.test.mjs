@@ -52,6 +52,9 @@ test("serves the game route and keeps all playable assets", async () => {
     access(new URL("sprites-v2.png", gameRoot)),
     access(new URL("sprites-v3.png", gameRoot)),
     access(new URL("enemy-animations-v3.png", gameRoot)),
+    access(new URL("app-icon.png", gameRoot)),
+    access(new URL("manifest.webmanifest", gameRoot)),
+    access(new URL("sw.js", gameRoot)),
     access(new URL("backgrounds-v3.png", gameRoot)),
     access(new URL("audio/music-meadow.wav", gameRoot)),
     access(new URL("audio/music-chase.wav", gameRoot)),
@@ -67,6 +70,8 @@ test("serves the game route and keeps all playable assets", async () => {
   ]);
   assert.match(gameHtml, /id="game"/);
   assert.match(gameHtml, /id="start-button"/);
+  assert.match(gameHtml, /id="install-button"/);
+  assert.match(gameHtml, /rel="manifest"/);
   assert.match(gameScript, /function triggerResonance/);
   assert.match(gameScript, /function speakOusang/);
   assert.match(gameScript, /function openUpgrade/);
@@ -74,6 +79,9 @@ test("serves the game route and keeps all playable assets", async () => {
   assert.match(gameScript, /function drawEnemyAtlas/);
   assert.match(gameScript, /function beginWindup/);
   assert.match(gameScript, /enemy-animations-v3\.png/);
+  assert.match(gameScript, /MAX_PARTICLES/);
+  assert.match(gameScript, /SIM_STEP/);
+  assert.match(gameScript, /serviceWorker/);
   assert.match(gameScript, /function createObstacles/);
   assert.match(gameScript, /function damageObstacle/);
   assert.match(gameScript, /backgrounds-v3\.png/);
