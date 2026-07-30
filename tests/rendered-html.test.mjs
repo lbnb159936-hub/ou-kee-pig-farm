@@ -49,6 +49,7 @@ test("serves the game route and keeps all playable assets", async () => {
     access(new URL("game.css", gameRoot)),
     access(new URL("game.js", gameRoot)),
     access(new URL("key-art.png", gameRoot)),
+    access(new URL("sprites-v2.png", gameRoot)),
     access(new URL("../audio/ousang-lively.mp3", gameRoot)),
   ]);
 
@@ -61,4 +62,6 @@ test("serves the game route and keeps all playable assets", async () => {
   assert.match(gameScript, /function triggerResonance/);
   assert.match(gameScript, /function speakOusang/);
   assert.match(gameScript, /function openUpgrade/);
+  assert.match(gameScript, /function drawAtlas/);
+  assert.match(gameScript, /function beginWindup/);
 });

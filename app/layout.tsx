@@ -9,10 +9,10 @@ export async function generateMetadata(): Promise<Metadata> {
   const imageUrl = `${protocol}://${host}/game-static/key-art.png`;
   return {
     title: "欧桑大逃亡 · 今晚不加菜",
-    description: "冲出农场，救下彩猪。同色四只发动共鸣，一起逃离欧记屠宰场。",
+    description: "精致像素横版动作肉鸽：看准预警，完美冲刺，救下彩猪，同色四只发动共鸣。",
     openGraph: {
       title: "欧桑大逃亡 · 今晚不加菜",
-      description: "横版动作肉鸽试玩版：会喊欧桑的彩猪逃亡记。",
+      description: "像素横版动作肉鸽：会喊欧桑、会完美冲刺的彩猪逃亡记。",
       images: [{ url: imageUrl, width: 1672, height: 941 }],
     },
     twitter: { card: "summary_large_image", images: [imageUrl] },
